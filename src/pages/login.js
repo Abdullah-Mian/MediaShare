@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
 
@@ -19,6 +19,9 @@ export default function Login() {
             if (login(email, password)) {
                 handleGetStarted();
             } else {
+                // Show error message
+                console.error("Login failed. Please check your credentials.");
+                alert("Login failed. Please check your credentials.");
             }
         } else {
             const name = e.target.name.value;

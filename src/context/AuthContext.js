@@ -1,8 +1,7 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 
-// Simple UUID generator function
 const generateId = () => {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  return Math.random().toString(36);
 };
 
 const AuthContext = createContext();
@@ -10,6 +9,27 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+
+  // Load users from localStorage on component mount
+  useEffect(() => {
+    const storedUsers = localStorage.getItem('users');
+    if (storedUsers) {
+      try {
+        const parsedUsers = JSON.parse(storedUsers);
+        setUsers(parsedUsers);
+        console.log('Loaded users from localStorage:', parsedUsers);
+      } catch (error) {
+        console.error('Error parsing users from localStorage:', error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (users.length > 0) {
+      localStorage.setItem('users', JSON.stringify(users));
+      console.log('Saved users to localStorage:', users);
+    }
+  }, [users]);
  
   const signUp = ({ name, email, password }) => {
     const userExists = users.some(user => user.email === email);
@@ -27,10 +47,9 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(newUser);
     return true;
   };
-
+  console.log("Current user:", currentUser);
   const login = (email, password) => {
     const user = users.find(u => u.email === email && u.password === password);
-    console.log("users:", users);
 
     if (user) {
       setCurrentUser(user);
