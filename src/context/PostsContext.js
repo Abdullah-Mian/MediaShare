@@ -1,9 +1,12 @@
 import { createContext, useState, useContext, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 const PostContext = createContext();
 
 export const PostProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
+  const [comments, setComments] = useState([]);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     // const dummyPosts = [
@@ -35,15 +38,35 @@ export const PostProvider = ({ children }) => {
       }
     };
 
+    const fetchComments = async () => {
+      try {
+        posts.forEach(async (post) => {
+          const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${post.id}/comments`);
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          const data = await res.json();
+          setComments((prevComments) => ({
+            ...prevComments,
+            [post.id]: data.slice(0, 10),
+          }));
+        });
+
+
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+      }
+    };
     fetchPosts();
+    fetchComments();
   }, []);
 
 
-  const addPost = (newPost) => {
+  const CreatePost = (newPost) => {
     const post = {
       ...newPost,
       id: Date.now(),
-      userId: 1
+      userId: currentUser.id
     };
     setPosts((prev) => [post, ...prev]);
   };
@@ -61,7 +84,7 @@ export const PostProvider = ({ children }) => {
   };
 
   return (
-    <PostContext.Provider value={{ posts, addPost, setPosts, editPost, deletePost }}>
+    <PostContext.Provider value={{ posts, CreatePost, setPosts, editPost, deletePost, comments }}>
       {children}
     </PostContext.Provider>
   );

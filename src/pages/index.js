@@ -6,6 +6,9 @@ export default function Home() {
   const handleGetStarted = () => {
     router.push("/login");
   };
+  const handleContinueAsGuest = () => {
+    router.push("/Posts");
+  };
 
   return (
     <div className="h-screen flex flex-col">
@@ -21,8 +24,8 @@ export default function Home() {
             <button onClick={handleGetStarted} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
               Get Started
             </button>
-            <button className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-              Learn More
+            <button onClick={handleContinueAsGuest} className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+              Continue as Guest
             </button>
           </div>
         </div>

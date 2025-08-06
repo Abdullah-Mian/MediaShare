@@ -1,46 +1,68 @@
 import { useAuth } from "@/context/AuthContext";
 import { usePosts } from "@/context/PostsContext";
 import PostCard from "@/Components/postCard";
-import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function Posts() {
-    const { currentUser ,users } = useAuth();
-    const { posts,  } = usePosts();
+    const { currentUser, setCurrentUser } = useAuth();
+    const { posts, comments } = usePosts();
+    const router = useRouter();
+    
+    const handleLogin = () => {
+        router.push("/login");
+    };
 
-    // useEffect(() => {
-    //     const fetchPosts = async () => {
-    //         try {
-    //             const res = await fetch('https://jsonplaceholder.typicode.com/posts');
-    //             const data = await res.json();
-    //             setPosts(data.slice(0, 10));
-    //             console.log('Fetched posts from API:', data.slice(0, 20));
-    //         } catch (error) {
-    //             console.error('Error fetching posts:', error);
-    //         }
-    //     };
-
-    //     if (!posts || posts.length === 10) {
-    //         fetchPosts();
-    //     }
-    // }, [posts.length === 10]);
-
-    console.log('users:', users);
+    const handleLogout = () => {
+        console.log("User logged out");
+        setCurrentUser(null);
+        router.push("/");
+    };
+    console.log("Current user:", currentUser);
+    console.log("Posts:", posts);
+    console.log("Comments:", comments);
     return (
-        <div className="container mx-auto p-4 min-h-screen">
-            <h1 className="text-3xl font-bold mb-8 text-center">Welcome back {currentUser.name}</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {posts && posts.length > 0 ? (
-                    posts.map(post => (
-                        <PostCard
-                            key={post.id}
-                            post={post}
-                        />
-                    ))
-                ) : (
-                    <div className="col-span-full flex justify-center items-center py-12">
-                        <p className="text-gray-500 text-lg">Loading posts...</p>
+        <div className="min-h-screen">
+            <nav className="shadow-lg border-b border-gray-200">
+                <div className="container mx-auto px-6 py-4">
+                    <div className="flex justify-between items-center">
+                        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            MediaShare
+                        </h1>
+                        <div className="flex items-center space-x-4">
+                            {currentUser && (
+                                <button onClick ={() => router.push('/Posts/create-post')}
+                                className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out">
+                                    Create Post
+                                </button>
+                            )}
+                            <button 
+                                onClick={currentUser ? handleLogout : handleLogin}
+                                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out"
+                            >
+                                {currentUser ? "Logout" : "Login"}
+                            </button>
+                        </div>
                     </div>
-                )}
+                </div>
+            </nav>
+
+            <div className="container mx-auto p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {posts && posts.length > 0 ? (
+                        posts.map(post => (
+                            <div key={post.id} className="transform hover:scale-105 transition-transform duration-300">
+                                <PostCard post={post} isOwner={currentUser?.id === post.userId} />
+                            </div>
+                        ))
+                    ) : (       
+                        <div className="col-span-full flex justify-center items-center py-20">
+                            <div className="text-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+                                <p className="text-gray-600 text-lg font-medium">Loading posts...</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
