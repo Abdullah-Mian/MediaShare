@@ -21,7 +21,7 @@ export const PostProvider = ({ children }) => {
     //   { id: 9, userId: 1, title: "Frontend Performance Optimization", body: "Optimizing frontend performance involves techniques like code splitting, lazy loading, image optimization, and minimizing bundle sizes." },
     //   { id: 10, userId: 1, title: "Version Control with Git", body: "Git is an essential tool for developers. Understanding branching, merging, and collaboration workflows is crucial for team development." }
     // ];
-    
+
     //  const dummyComments = [
     //   { postId: 1, id: 1, name: "John Doe", email: "john@example.com", body: "Great post!" },
     //   { postId: 1, id: 2, name: "Jane Smith", email: "jane@example.com", body: "Very informative, thanks!" },
@@ -114,8 +114,39 @@ export const PostProvider = ({ children }) => {
     setPosts((prev) => prev.filter(post => post.id !== id));
   };
 
+  const commentOnPost = (postId, comment) => {
+    setPosts((prev) =>
+      prev.map(post =>
+        post.id === postId ? { ...post, comments: [...post.comments, comment] } : post
+      )
+    );
+  };
+
+  const editComment = (postId, commentId, updatedBody) => {
+    setPosts((prev) =>
+      prev.map(post =>
+        post.id === postId
+          ? { ...post,
+            comments: post.comments.map(comment =>
+              comment.id === commentId ? { ...comment, body: updatedBody } : comment  
+            )
+          }
+          : post
+      )
+    );
+  }
+  const deleteComment = (postId, commentId) => {
+    setPosts((prev) =>
+      prev.map(post =>
+        post.id === postId
+          ? { ...post, comments: post.comments.filter(comment => comment.id !== commentId) }
+          : post
+      )
+    );
+  };
+
   return (
-    <PostContext.Provider value={{ posts, CreatePost, setPosts, editPost, deletePost }}>
+    <PostContext.Provider value={{ posts, CreatePost, setPosts, editPost, deletePost, commentOnPost, editComment, deleteComment }}>
       {children}
     </PostContext.Provider>
   );
