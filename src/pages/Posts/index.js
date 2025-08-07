@@ -5,9 +5,13 @@ import { useRouter } from "next/router";
 
 export default function Posts() {
     const { currentUser, setCurrentUser } = useAuth();
-    const { posts, comments } = usePosts();
+    const { posts } = usePosts();
     const router = useRouter();
-    
+
+
+    console.log("Current user:", currentUser);
+    console.log("Posts:", posts);
+
     const handleLogin = () => {
         router.push("/login");
     };
@@ -17,9 +21,7 @@ export default function Posts() {
         setCurrentUser(null);
         router.push("/");
     };
-    console.log("Current user:", currentUser);
-    console.log("Posts:", posts);
-    console.log("Comments:", comments);
+
     return (
         <div className="min-h-screen">
             <nav className="shadow-lg border-b border-gray-200">
@@ -30,12 +32,12 @@ export default function Posts() {
                         </h1>
                         <div className="flex items-center space-x-4">
                             {currentUser && (
-                                <button onClick ={() => router.push('/Posts/create-post')}
-                                className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out">
+                                <button onClick={() => router.push('/Posts/create-post')}
+                                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out">
                                     Create Post
                                 </button>
                             )}
-                            <button 
+                            <button
                                 onClick={currentUser ? handleLogout : handleLogin}
                                 className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out"
                             >
@@ -54,7 +56,7 @@ export default function Posts() {
                                 <PostCard post={post} isOwner={currentUser?.id === post.userId} />
                             </div>
                         ))
-                    ) : (       
+                    ) : (
                         <div className="col-span-full flex justify-center items-center py-20">
                             <div className="text-center">
                                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>

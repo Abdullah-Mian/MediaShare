@@ -5,7 +5,7 @@ const PostContext = createContext();
 
 export const PostProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
-  const [comments, setComments] = useState([]);
+
   const { currentUser } = useAuth();
 
   useEffect(() => {
@@ -21,7 +21,23 @@ export const PostProvider = ({ children }) => {
     //   { id: 9, userId: 1, title: "Frontend Performance Optimization", body: "Optimizing frontend performance involves techniques like code splitting, lazy loading, image optimization, and minimizing bundle sizes." },
     //   { id: 10, userId: 1, title: "Version Control with Git", body: "Git is an essential tool for developers. Understanding branching, merging, and collaboration workflows is crucial for team development." }
     // ];
-
+    
+    //  const dummyComments = [
+    //   { postId: 1, id: 1, name: "John Doe", email: "john@example.com", body: "Great post!" },
+    //   { postId: 1, id: 2, name: "Jane Smith", email: "jane@example.com", body: "Very informative, thanks!" },
+    //   { postId: 2, id: 3, name: "Alice Johnson", email: "alice@example.com", body: "I learned a lot from this." },
+    //   { postId: 2, id: 4, name: "Bob Brown", email: "bob@example.com", body: "Thanks for sharing!" },
+    //   { postId: 3, id: 5, name: "Charlie Davis", email: "charlie@example.com", body: "Interesting perspective." },
+    //   { postId: 3, id: 6, name: "Diana Prince", email: "diana@example.com", body: "I completely agree!" },
+    //   { postId: 4, id: 7, name: "Eve Adams", email: "eve@example.com", body: "Thanks for the insights!" },
+    //   { postId: 4, id: 8, name: "Frank Castle", email: "frank@example.com", body: "I found this very helpful." },
+    //   { postId: 5, id: 9, name: "Grace Lee", email: "grace@example.com", body: "This was exactly what I needed." },
+    //   { postId: 5, id: 10, name: "Hank Pym", email: "hank@example.com", body: "I appreciate the detailed explanation." },
+    //   { postId: 6, id: 11, name: "Ivy Carter", email: "ivy@example.com", body: "This post was very helpful." },
+    //   { postId: 6, id: 12, name: "Jack Sparrow", email: "jack@example.com", body: "Aye, this be a great read!" },
+    //   { postId: 7, id: 13, name: "Kara Danvers", email: "kara@example.com", body: "I found this very insightful." },
+    //   { postId: 7, id: 14, name: "Liam Neeson", email: "liam@example.com", body: "I agree with Kara, this was well written." }
+    // ];
     const fetchPosts = async () => {
       try {
         const res = await fetch('https://jsonplaceholder.typicode.com/posts');
@@ -29,44 +45,59 @@ export const PostProvider = ({ children }) => {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
         const data = await res.json();
-        setPosts(data.slice(0, 10));
-        console.log('Fetched posts from API:', data.slice(0, 10));
+        const postsWithInitializedComments = data.slice(0, 10).map(post => ({
+          ...post,
+          comments: [] 
+        }));
+        setPosts(postsWithInitializedComments);
+        console.log('Fetched posts from API:', postsWithInitializedComments);
+        
+        // Fetch comments for each post
+        fetchCommentsForPosts(postsWithInitializedComments);
       } catch (error) {
         console.error('Error fetching posts:', error);
-        // console.log('Using dummy posts as fallback');
-        // setPosts(dummyPosts);
       }
     };
 
-    const fetchComments = async () => {
+    const fetchCommentsForPosts = async (postsArray) => {
       try {
-        posts.forEach(async (post) => {
+        const commentsPromises = postsArray.map(async (post) => {
           const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${post.id}/comments`);
           if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status}`);
           }
-          const data = await res.json();
-          setComments((prevComments) => ({
-            ...prevComments,
-            [post.id]: data.slice(0, 10),
-          }));
+          const comments = await res.json();
+          return { postId: post.id, comments: comments.slice(0, 3) };
         });
 
+        const fetchedComments = await Promise.all(commentsPromises);
 
+        // Update posts with their comments
+        setPosts(prevPosts => 
+          prevPosts.map(post => {
+            const postComments = fetchedComments.find(comment => comment.postId === post.id);
+            return {
+              ...post,
+              comments: postComments ? postComments.comments : []
+            };
+          })
+        );
+        
+        console.log('Updated posts with comments');
       } catch (error) {
         console.error('Error fetching comments:', error);
       }
     };
-    fetchPosts();
-    fetchComments();
-  }, []);
 
+    fetchPosts();
+  }, []);
 
   const CreatePost = (newPost) => {
     const post = {
       ...newPost,
       id: Date.now(),
-      userId: currentUser.id
+      userId: currentUser.id,
+      comments: [] 
     };
     setPosts((prev) => [post, ...prev]);
   };
@@ -84,7 +115,7 @@ export const PostProvider = ({ children }) => {
   };
 
   return (
-    <PostContext.Provider value={{ posts, CreatePost, setPosts, editPost, deletePost, comments }}>
+    <PostContext.Provider value={{ posts, CreatePost, setPosts, editPost, deletePost }}>
       {children}
     </PostContext.Provider>
   );

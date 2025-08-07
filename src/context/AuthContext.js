@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }) => {
       try {
         const parsedUsers = JSON.parse(storedUsers);
         setUsers(parsedUsers);
-        console.log('Loaded users from localStorage:', parsedUsers);
       } catch (error) {
         console.error('Error parsing users from localStorage:', error);
       }
@@ -27,14 +26,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (users.length > 0) {
       localStorage.setItem('users', JSON.stringify(users));
-      console.log('Saved users to localStorage:', users);
     }
   }, [users]);
  
   const signUp = ({ name, email, password }) => {
     const userExists = users.some(user => user.email === email);
     if (userExists) return false; 
-    console.log("users:", users);
 
     const newUser = {
       id: generateId(),
@@ -47,7 +44,6 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(newUser);
     return true;
   };
-  console.log("Current user:", currentUser);
   const login = (email, password) => {
     const user = users.find(u => u.email === email && u.password === password);
 
