@@ -36,7 +36,12 @@ export const PostProvider = ({ children }) => {
     //   { postId: 6, id: 11, name: "Ivy Carter", email: "ivy@example.com", body: "This post was very helpful." },
     //   { postId: 6, id: 12, name: "Jack Sparrow", email: "jack@example.com", body: "Aye, this be a great read!" },
     //   { postId: 7, id: 13, name: "Kara Danvers", email: "kara@example.com", body: "I found this very insightful." },
-    //   { postId: 7, id: 14, name: "Liam Neeson", email: "liam@example.com", body: "I agree with Kara, this was well written." }
+    //   { postId: 7, id: 14, name: "Liam Neeson", email: "liam@example.com", body: "I agree with Kara, this was well written." },
+    //   { postId: 8, id: 15, name: "Mia Wong", email: "mia@example.com", body: "This post was very helpful." },
+    //   { postId: 8, id: 16, name: "Nina Patel", email: "nina@example.com", body: "I found this post very insightful." },
+    //   { postId: 9, id: 17, name: "Oscar Wilde", email: "oscar@example.com", body: "A timeless classic." },
+    //   { postId: 9, id: 18, name: "Peter Parker", email: "peter@example.com", body: "With great power comes great responsibility." },
+    //   { postId: 10, id: 19, name: "Quinn Fabray", email: "quinn@example.com", body: "I love the character development in this post." }
     // ];
     const fetchPosts = async () => {
       try {
@@ -50,13 +55,22 @@ export const PostProvider = ({ children }) => {
           comments: [] 
         }));
         setPosts(postsWithInitializedComments);
-        console.log('Fetched posts from API:', postsWithInitializedComments);
         
         // Fetch comments for each post
         fetchCommentsForPosts(postsWithInitializedComments);
       } catch (error) {
         console.error('Error fetching posts:', error);
       }
+
+      // when API is not available
+      // ////////////////////
+      // const dummyPostsWithInitializedComments = dummyPosts.map(post => ({
+      //   ...post,
+      //   comments: []
+      // }));
+      // setPosts(dummyPostsWithInitializedComments);
+      // fetchCommentsForPosts(dummyPostsWithInitializedComments);
+      // //////////////////
     };
 
     const fetchCommentsForPosts = async (postsArray) => {
@@ -72,7 +86,6 @@ export const PostProvider = ({ children }) => {
 
         const fetchedComments = await Promise.all(commentsPromises);
 
-        // Update posts with their comments
         setPosts(prevPosts => 
           prevPosts.map(post => {
             const postComments = fetchedComments.find(comment => comment.postId === post.id);
@@ -83,10 +96,22 @@ export const PostProvider = ({ children }) => {
           })
         );
         
-        console.log('Updated posts with comments');
       } catch (error) {
         console.error('Error fetching comments:', error);
       }
+
+      // when API is not available
+      ///////////////////////////
+      // setPosts(prevPosts =>
+      //   prevPosts.map(post => {
+      //     const postComments = dummyComments.filter(comment => comment.postId === post.id);
+      //     return {
+      //       ...post,
+      //       comments: postComments
+      //     };
+      //   })
+      // );
+      ///////////////////////////
     };
 
     fetchPosts();

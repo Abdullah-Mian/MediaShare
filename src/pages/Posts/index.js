@@ -8,16 +8,11 @@ export default function Posts() {
     const { posts } = usePosts();
     const router = useRouter();
 
-
-    console.log("Current user:", currentUser);
-    console.log("Posts:", posts);
-
     const handleLogin = () => {
         router.push("/login");
     };
 
     const handleLogout = () => {
-        console.log("User logged out");
         setCurrentUser(null);
         router.push("/");
     };
