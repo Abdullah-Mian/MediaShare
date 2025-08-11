@@ -45,19 +45,15 @@ export const PostProvider = ({ children }) => {
     // ];
     const fetchPosts = async () => {
       try {
-        const res = await fetch('https://jsonplaceholder.typicode.com/posts');
+        const res = await fetch('/api/posts');
         if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
+          throw new Error(`HTTP error! status: ${res.status}`); 
         }
         const data = await res.json();
-        const postsWithInitializedComments = data.slice(0, 10).map(post => ({
-          ...post,
-          comments: [] 
-        }));
-        setPosts(postsWithInitializedComments);
+        setPosts(data);
         
         // Fetch comments for each post
-        fetchCommentsForPosts(postsWithInitializedComments);
+        fetchCommentsForPosts(data);
       } catch (error) {
         console.error('Error fetching posts:', error);
       }
@@ -76,12 +72,12 @@ export const PostProvider = ({ children }) => {
     const fetchCommentsForPosts = async (postsArray) => {
       try {
         const commentsPromises = postsArray.map(async (post) => {
-          const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${post.id}/comments`);
+          const res = await fetch(`/api/posts/${post.id}/comments`);
           if (!res.ok) {
             throw new Error(`HTTP error! status: ${res.status}`);
           }
           const comments = await res.json();
-          return { postId: post.id, comments: comments.slice(0, 3) };
+          return { postId: post.id, comments };
         });
 
         const fetchedComments = await Promise.all(commentsPromises);
@@ -176,5 +172,7 @@ export const PostProvider = ({ children }) => {
     </PostContext.Provider>
   );
 };
+
+
 
 export const usePosts = () => useContext(PostContext);

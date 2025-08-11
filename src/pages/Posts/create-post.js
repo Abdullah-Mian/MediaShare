@@ -1,8 +1,9 @@
 import { usePosts } from "@/context/PostsContext"
 import { useRouter } from "next/router";
 import { useState } from "react";
+import withAuth from "@/Components/withAuth";
 
-export default function CreatePost() {
+const  CreatePost = function() {
     const { CreatePost } = usePosts();
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -98,3 +99,5 @@ export default function CreatePost() {
         </div>
     );
 }
+
+export default withAuth(CreatePost);

@@ -2,8 +2,9 @@ import { useAuth } from "@/context/AuthContext";
 import { usePosts } from "@/context/PostsContext";
 import PostCard from "@/Components/postCard";
 import { useRouter } from "next/router";
+import withAuth from "@/Components/withAuth";
 
-export default function Posts() {
+const Posts = function () {
     const { currentUser, setCurrentUser } = useAuth();
     const { posts } = usePosts();
     const router = useRouter();
@@ -64,3 +65,4 @@ export default function Posts() {
         </div>
     );
 }
+export default withAuth(Posts, { allowGuest: true });

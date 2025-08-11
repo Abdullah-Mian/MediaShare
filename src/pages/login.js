@@ -7,6 +7,12 @@ export default function Login() {
     const { signUp, login, currentUser } = useAuth();
     const router = useRouter();
     
+    useEffect(() => {
+        if (currentUser) {
+            router.replace('/Posts');
+        }
+    }, [currentUser, router]);
+    
     const handleGetStarted = () => {
         router.push('/Posts');
     }
